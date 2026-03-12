@@ -32,7 +32,7 @@ import java.util.Objects;
 import static org.springframework.http.HttpStatus.*;
 
 @RestControllerAdvice
-public class SecurityExceptionsHandler {
+public class SecurityExceptionsHandler  {
 
     private static final String ACCOUNT_LOCKED = "Votre compte a été bloqué. Veuillez contacter l'administration";
     private static final String METHOD_IS_NOT_ALLOWED = "Cette méthode de demande n'est pas autorisée sur ce point de terminaison. Veuillez envoyer une demande %s";
