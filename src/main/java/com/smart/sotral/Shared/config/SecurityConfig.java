@@ -39,6 +39,14 @@ public class SecurityConfig {
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(
+                        "/swagger-ui.html",
+                        "/swagger-ui/**",
+                        "/v3/api-docs",
+                        "/v3/api-docs/**",
+                        "/api/auth/**",
+                        "/api/capteurs/position"
+                ).permitAll()
                 .requestMatchers(JavaConstant.ADMIN_ONLY_URLS).hasRole("ADMIN")
                 .requestMatchers(JavaConstant.PUBLIC_URLS).permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/capteurs/position").permitAll()
