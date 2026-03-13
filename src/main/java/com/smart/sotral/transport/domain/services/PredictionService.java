@@ -5,16 +5,17 @@ import java.util.List;
 import com.smart.sotral.transport.application.dtos.PredictionRequest;
 import com.smart.sotral.transport.application.dtos.PredictionResponse;
 import com.smart.sotral.transport.domain.models.Capteur;
+import java.util.UUID;
 
 public interface PredictionService {
     PredictionResponse create(PredictionRequest request);
-    PredictionResponse update(Long id, PredictionRequest request);
-    PredictionResponse get(Long id);
+    PredictionResponse update(UUID trackingId, PredictionRequest request);
+    PredictionResponse get(UUID trackingId);
     List<PredictionResponse> list();
-    void delete(Long id);
+    void delete(UUID trackingId);
 
-    void calculerPrediction(Long vehiculeId, Capteur capteurActuel);
+    void calculerPrediction(UUID vehiculeTrackingId, Capteur capteurActuel);
 
-    List<PredictionResponse> findByArret(Long arretId);
-    List<PredictionResponse> findByBus(Long busId);
+    List<PredictionResponse> findByArret(UUID arretTrackingId);
+    List<PredictionResponse> findByBus(UUID busTrackingId);
 }

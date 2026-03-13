@@ -1,6 +1,7 @@
 package com.smart.sotral.transport.domain.services.servicesImpl;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,16 +34,16 @@ public class LigneServiceImpl implements LigneService {
     }
 
     @Override
-    public LigneResponse update(Long id, LigneRequest request) {
-        Ligne existing = repository.findById(id).orElseThrow();
+    public LigneResponse update(UUID trackingId, LigneRequest request) {
+        Ligne existing = repository.findByTrackingId(trackingId).orElseThrow();
         Ligne entity = buildEntity(request, existing);
         return LigneMapper.toResponse(repository.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public LigneResponse get(Long id) {
-        return repository.findById(id).map(LigneMapper::toResponse).orElseThrow();
+    public LigneResponse get(UUID trackingId) {
+        return repository.findByTrackingId(trackingId).map(LigneMapper::toResponse).orElseThrow();
     }
 
     @Override
@@ -52,12 +53,13 @@ public class LigneServiceImpl implements LigneService {
     }
 
     @Override
-    public void delete(Long id) {
-        repository.deleteById(id);
+    public void delete(UUID trackingId) {
+        Ligne existing = repository.findByTrackingId(trackingId).orElseThrow();
+        repository.delete(existing);
     }
 
     private Ligne buildEntity(LigneRequest request, Ligne entity) {
-        TypeLigne type = typeLigneRepository.findById(request.getTypeLigneId()).orElseThrow();
+        TypeLigne type = typeLigneRepository.findByTrackingId(request.getTypeLigneTrackingId()).orElseThrow();
         entity.setNumero(request.getNumero());
         entity.setDepart(request.getDepart());
         entity.setArrive(request.getArrive());

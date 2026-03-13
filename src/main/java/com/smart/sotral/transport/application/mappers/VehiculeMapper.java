@@ -17,6 +17,7 @@ public class VehiculeMapper {
     public static VehiculeResponse toResponse(Vehicule entity) {
         return VehiculeResponse.builder()
                 .id(entity.getId())
+                .trackingId(entity.getTrackingId())
                 .matricule(entity.getMatricule())
                 .marque(entity.getMarque())
                 .modele(entity.getModele())

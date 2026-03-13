@@ -1,6 +1,7 @@
 package com.smart.sotral.transport.domain.services.servicesImpl;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,16 +38,16 @@ public class MissionServiceImpl implements MissionService {
     }
 
     @Override
-    public MissionResponse update(Long id, MissionRequest request) {
-        Mission existing = repository.findById(id).orElseThrow();
+    public MissionResponse update(UUID trackingId, MissionRequest request) {
+        Mission existing = repository.findByTrackingId(trackingId).orElseThrow();
         Mission entity = buildEntity(request, existing);
         return MissionMapper.toResponse(repository.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public MissionResponse get(Long id) {
-        return repository.findById(id).map(MissionMapper::toResponse).orElseThrow();
+    public MissionResponse get(UUID trackingId) {
+        return repository.findByTrackingId(trackingId).map(MissionMapper::toResponse).orElseThrow();
     }
 
     @Override
@@ -56,13 +57,14 @@ public class MissionServiceImpl implements MissionService {
     }
 
     @Override
-    public void delete(Long id) {
-        repository.deleteById(id);
+    public void delete(UUID trackingId) {
+        Mission existing = repository.findByTrackingId(trackingId).orElseThrow();
+        repository.delete(existing);
     }
 
     private Mission buildEntity(MissionRequest request, Mission entity) {
-        BusVehicule busVehicule = busVehiculeRepository.findById(request.getBusVehiculeId()).orElseThrow();
-        Conducteur conducteur = conducteurRepository.findById(request.getConducteurId()).orElseThrow();
+        BusVehicule busVehicule = busVehiculeRepository.findByTrackingId(request.getBusVehiculeTrackingId()).orElseThrow();
+        Conducteur conducteur = conducteurRepository.findByTrackingId(request.getConducteurTrackingId()).orElseThrow();
         entity.setBusVehicule(busVehicule);
         entity.setConducteur(conducteur);
         entity.setDateDebut(request.getDateDebut());

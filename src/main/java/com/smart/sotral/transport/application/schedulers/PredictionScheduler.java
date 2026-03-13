@@ -13,6 +13,7 @@ import com.smart.sotral.transport.domain.repositories.CapteurRepository;
 import com.smart.sotral.transport.domain.repositories.MissionRepository;
 import com.smart.sotral.transport.domain.services.PredictionService;
 import com.smart.sotral.transport.domain.enums.StatutMission;
+import java.util.UUID;
 
 @Component
 public class PredictionScheduler {
@@ -36,7 +37,7 @@ public class PredictionScheduler {
     public void recalculerToutesPredictions() {
         List<BusVehicule> actifs = busVehiculeRepository.findByStatut("ACTIF");
         for (BusVehicule bv : actifs) {
-            var capteurOpt = capteurRepository.findTopByVehiculeIdOrderByHorodatageDesc(bv.getVehicule().getId());
+            var capteurOpt = capteurRepository.findTopByVehicule_TrackingIdOrderByHorodatageDesc(bv.getVehicule().getTrackingId());
             if (capteurOpt.isEmpty()) {
                 continue;
             }
@@ -44,7 +45,7 @@ public class PredictionScheduler {
             if (capteur.getHorodatage() != null && capteur.getHorodatage().isBefore(LocalDateTime.now().minusMinutes(5))) {
                 continue;
             }
-            predictionService.calculerPrediction(bv.getVehicule().getId(), capteur);
+            predictionService.calculerPrediction(bv.getVehicule().getTrackingId(), capteur);
         }
     }
 
@@ -52,12 +53,12 @@ public class PredictionScheduler {
     public void nettoyerPredictionsObsoletes() {
         // simple: delete predictions if no active mission found
         var actifs = missionRepository.findByStatut(StatutMission.ACTIVE);
-        var busIdsActifs = actifs.stream()
-                .map(m -> busVehiculeRepository.findById(m.getBusVehicule().getId()).map(bv -> bv.getBus().getId()).orElse(null))
+        var busTrackingActifs = actifs.stream()
+                .map(m -> m.getBusVehicule().getBus().getTrackingId())
                 .filter(id -> id != null)
                 .toList();
         predictionService.list().stream()
-                .filter(p -> !busIdsActifs.contains(p.getBusId()))
-                .forEach(p -> predictionService.delete(p.getId()));
+                .filter(p -> !busTrackingActifs.contains(p.getBusTrackingId()))
+                .forEach(p -> predictionService.delete(p.getTrackingId()));
     }
 }

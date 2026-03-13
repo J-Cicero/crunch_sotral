@@ -1,19 +1,31 @@
 package com.smart.sotral.transport.domain.services.servicesImpl;
 
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.smart.sotral.transport.application.dtos.CapteurRequest;
 import com.smart.sotral.transport.application.dtos.CapteurResponse;
+import com.smart.sotral.transport.application.dtos.PositionBusDTO;
 import com.smart.sotral.transport.application.mappers.CapteurMapper;
+import com.smart.sotral.transport.domain.enums.StatutMission;
+import com.smart.sotral.transport.domain.models.Bus;
+import com.smart.sotral.transport.domain.models.BusVehicule;
 import com.smart.sotral.transport.domain.models.Capteur;
+import com.smart.sotral.transport.domain.models.Ligne;
 import com.smart.sotral.transport.domain.models.Vehicule;
+import com.smart.sotral.transport.domain.repositories.BusRepository;
+import com.smart.sotral.transport.domain.repositories.BusVehiculeRepository;
 import com.smart.sotral.transport.domain.repositories.CapteurRepository;
+import com.smart.sotral.transport.domain.repositories.MissionRepository;
+import com.smart.sotral.transport.domain.repositories.PredictionRepository;
 import com.smart.sotral.transport.domain.repositories.VehiculeRepository;
 import com.smart.sotral.transport.domain.services.CapteurService;
-import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -21,10 +33,25 @@ public class CapteurServiceImpl implements CapteurService {
 
     private final CapteurRepository repository;
     private final VehiculeRepository vehiculeRepository;
+    private final BusRepository busRepository;
+    private final BusVehiculeRepository busVehiculeRepository;
+    private final MissionRepository missionRepository;
+    private final PredictionRepository predictionRepository;
 
-    public CapteurServiceImpl(CapteurRepository repository, VehiculeRepository vehiculeRepository) {
+    public CapteurServiceImpl(
+            CapteurRepository repository,
+            VehiculeRepository vehiculeRepository,
+            BusRepository busRepository,
+            BusVehiculeRepository busVehiculeRepository,
+            MissionRepository missionRepository,
+            PredictionRepository predictionRepository
+    ) {
         this.repository = repository;
         this.vehiculeRepository = vehiculeRepository;
+        this.busRepository = busRepository;
+        this.busVehiculeRepository = busVehiculeRepository;
+        this.missionRepository = missionRepository;
+        this.predictionRepository = predictionRepository;
     }
 
     @Override
@@ -34,16 +61,16 @@ public class CapteurServiceImpl implements CapteurService {
     }
 
     @Override
-    public CapteurResponse update(Long id, CapteurRequest request) {
-        Capteur existing = repository.findById(id).orElseThrow();
+    public CapteurResponse update(UUID trackingId, CapteurRequest request) {
+        Capteur existing = repository.findByTrackingId(trackingId).orElseThrow();
         Capteur entity = buildEntity(request, existing);
         return CapteurMapper.toResponse(repository.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public CapteurResponse get(Long id) {
-        return repository.findById(id).map(CapteurMapper::toResponse).orElseThrow();
+    public CapteurResponse get(UUID trackingId) {
+        return repository.findByTrackingId(trackingId).map(CapteurMapper::toResponse).orElseThrow();
     }
 
     @Override
@@ -52,19 +79,44 @@ public class CapteurServiceImpl implements CapteurService {
         return repository.findAll().stream().map(CapteurMapper::toResponse).toList();
     }
 
+    @Override
     @Transactional(readOnly = true)
-    public List<CapteurResponse> getDernierePositionParVehicule() {
-        return repository.findDernierePositionParVehicule().stream().map(CapteurMapper::toResponse).toList();
+    public List<PositionBusDTO> getDernieresPositionsActives() {
+        return buildPositions(busVehiculeRepository.findByStatut("ACTIF"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PositionBusDTO> getDernieresPositionsParLigne(UUID ligneTrackingId) {
+        List<Bus> buses = busRepository.findByLigne_TrackingId(ligneTrackingId);
+        if (buses.isEmpty()) {
+            return List.of();
+        }
+        List<Long> busIds = buses.stream().map(Bus::getId).toList();
+        List<BusVehicule> vehicules = busVehiculeRepository.findByBus_TrackingIdInAndStatut(
+                buses.stream().map(Bus::getTrackingId).toList(), "ACTIF");
+        return buildPositions(vehicules);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PositionBusDTO> getDernieresPositionsParArret(UUID arretTrackingId) {
+        List<UUID> busTrackingIds = predictionRepository.findDistinctBusTrackingIdByArret_TrackingId(arretTrackingId);
+        if (busTrackingIds.isEmpty()) {
+            return List.of();
+        }
+        List<BusVehicule> vehicules = busVehiculeRepository.findByBus_TrackingIdInAndStatut(busTrackingIds, "ACTIF");
+        return buildPositions(vehicules);
     }
 
     @Transactional(readOnly = true)
-    public List<CapteurResponse> getDernieres5(Long vehiculeId) {
-        return repository.findTop5ByVehiculeIdOrderByHorodatageDesc(vehiculeId).stream().map(CapteurMapper::toResponse).toList();
+    public List<CapteurResponse> getDernieres5(UUID vehiculeTrackingId) {
+        return repository.findTop5ByVehicule_TrackingIdOrderByHorodatageDesc(vehiculeTrackingId).stream().map(CapteurMapper::toResponse).toList();
     }
 
     @Transactional(readOnly = true)
-    public List<CapteurResponse> getHistorique(Long vehiculeId) {
-        return repository.findByVehiculeIdOrderByHorodatageDesc(vehiculeId).stream().map(CapteurMapper::toResponse).toList();
+    public List<CapteurResponse> getHistorique(UUID vehiculeTrackingId) {
+        return repository.findByVehicule_TrackingIdOrderByHorodatageDesc(vehiculeTrackingId).stream().map(CapteurMapper::toResponse).toList();
     }
 
     public Capteur enregistrerPosition(CapteurRequest request) {
@@ -73,8 +125,9 @@ public class CapteurServiceImpl implements CapteurService {
     }
 
     @Override
-    public void delete(Long id) {
-        repository.deleteById(id);
+    public void delete(UUID trackingId) {
+        Capteur existing = repository.findByTrackingId(trackingId).orElseThrow();
+        repository.delete(existing);
     }
 
     private Capteur buildEntity(CapteurRequest request, Capteur entity) {
@@ -88,5 +141,45 @@ public class CapteurServiceImpl implements CapteurService {
         entity.setHorodatage(request.getHorodatage() != null ? request.getHorodatage() : LocalDateTime.now());
         entity.setSourceSignal(request.getSourceSignal());
         return entity;
+    }
+
+    private List<PositionBusDTO> buildPositions(Collection<BusVehicule> busVehicules) {
+        return busVehicules.stream()
+                .filter(this::hasActiveMission)
+                .map(this::buildPosition)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+    }
+
+    private boolean hasActiveMission(BusVehicule busVehicule) {
+        return missionRepository
+                .findByBusVehicule_TrackingIdAndStatut(busVehicule.getTrackingId(), StatutMission.ACTIVE)
+                .isPresent();
+    }
+
+    private Optional<PositionBusDTO> buildPosition(BusVehicule busVehicule) {
+        if (busVehicule.getVehicule() == null || busVehicule.getBus() == null) {
+            return Optional.empty();
+        }
+        Optional<Capteur> latest = repository.findTopByVehicule_TrackingIdOrderByHorodatageDesc(busVehicule.getVehicule().getTrackingId());
+        if (latest.isEmpty()) {
+            return Optional.empty();
+        }
+        Capteur capteur = latest.get();
+        Bus bus = busVehicule.getBus();
+        Ligne ligne = bus.getLigne();
+        return Optional.of(PositionBusDTO.builder()
+                .vehiculeTrackingId(busVehicule.getVehicule().getTrackingId())
+                .busTrackingId(bus.getTrackingId())
+                .busCode(bus.getCode())
+                .ligneTrackingId(ligne != null ? ligne.getTrackingId() : null)
+                .ligneNumero(ligne != null ? ligne.getNumero() : null)
+                .latitude(capteur.getLatitude())
+                .longitude(capteur.getLongitude())
+                .vitesse(capteur.getVitesse())
+                .horodatage(capteur.getHorodatage())
+                .missionActive(true)
+                .build());
     }
 }

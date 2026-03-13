@@ -9,15 +9,14 @@ import com.smart.sotral.transport.domain.models.Capteur;
 
 public interface CapteurRepository extends JpaRepository<Capteur, Long> {
 
-    Optional<Capteur> findTopByVehiculeIdOrderByHorodatageDesc(Long vehiculeId);
+    Optional<Capteur> findTopByVehicule_TrackingIdOrderByHorodatageDesc(java.util.UUID vehiculeTrackingId);
 
-    List<Capteur> findTop5ByVehiculeIdOrderByHorodatageDesc(Long vehiculeId);
+    List<Capteur> findTop5ByVehicule_TrackingIdOrderByHorodatageDesc(java.util.UUID vehiculeTrackingId);
 
-    @Query("SELECT c FROM Capteur c WHERE c.horodatage = (SELECT MAX(c2.horodatage) FROM Capteur c2 WHERE c2.vehicule.id = c.vehicule.id)")
+    @Query("SELECT c FROM Capteur c WHERE c.horodatage = (SELECT MAX(c2.horodatage) FROM Capteur c2 WHERE c2.vehicule.trackingId = c.vehicule.trackingId)")
     List<Capteur> findDernierePositionParVehicule();
 
-    List<Capteur> findByVehiculeIdOrderByHorodatageDesc(Long vehiculeId);
+    List<Capteur> findByVehicule_TrackingIdOrderByHorodatageDesc(java.util.UUID vehiculeTrackingId);
 
     Optional<Capteur> findByTrackingId(java.util.UUID trackingId);
-    List<Capteur> findByVehicule_TrackingIdOrderByHorodatageDesc(java.util.UUID vehiculeTrackingId);
 }

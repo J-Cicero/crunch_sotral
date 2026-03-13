@@ -1,6 +1,7 @@
 package com.smart.sotral.transport.domain.services.servicesImpl;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,16 +34,16 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public CourseResponse update(Long id, CourseRequest request) {
-        Course existing = repository.findById(id).orElseThrow();
+    public CourseResponse update(UUID trackingId, CourseRequest request) {
+        Course existing = repository.findByTrackingId(trackingId).orElseThrow();
         Course entity = buildEntity(request, existing);
         return CourseMapper.toResponse(repository.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public CourseResponse get(Long id) {
-        return repository.findById(id).map(CourseMapper::toResponse).orElseThrow();
+    public CourseResponse get(UUID trackingId) {
+        return repository.findByTrackingId(trackingId).map(CourseMapper::toResponse).orElseThrow();
     }
 
     @Override
@@ -52,12 +53,13 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void delete(Long id) {
-        repository.deleteById(id);
+    public void delete(UUID trackingId) {
+        Course existing = repository.findByTrackingId(trackingId).orElseThrow();
+        repository.delete(existing);
     }
 
     private Course buildEntity(CourseRequest request, Course entity) {
-        Mission mission = missionRepository.findById(request.getMissionId()).orElseThrow();
+        Mission mission = missionRepository.findByTrackingId(request.getMissionTrackingId()).orElseThrow();
         entity.setMission(mission);
         entity.setDateDebut(request.getDateDebut());
         entity.setDateFin(request.getDateFin());

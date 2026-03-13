@@ -4,11 +4,12 @@ import java.util.List;
 
 import com.smart.sotral.transport.application.dtos.VehiculeRequest;
 import com.smart.sotral.transport.application.dtos.VehiculeResponse;
+import java.util.UUID;
 
 public interface VehiculeService {
     VehiculeResponse create(VehiculeRequest request);
-    VehiculeResponse update(Long id, VehiculeRequest request);
-    VehiculeResponse get(Long id);
+    VehiculeResponse update(UUID trackingId, VehiculeRequest request);
+    VehiculeResponse get(UUID trackingId);
     List<VehiculeResponse> list();
-    void delete(Long id);
+    void delete(UUID trackingId);
 }

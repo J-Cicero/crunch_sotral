@@ -2,6 +2,7 @@ package com.smart.sotral.transport.domain.services.servicesImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,16 +65,16 @@ public class PredictionServiceImpl implements PredictionService {
     }
 
     @Override
-    public PredictionResponse update(Long id, PredictionRequest request) {
-        Prediction existing = predictionRepository.findById(id).orElseThrow();
+    public PredictionResponse update(UUID trackingId, PredictionRequest request) {
+        Prediction existing = predictionRepository.findByTrackingId(trackingId).orElseThrow();
         Prediction entity = buildEntity(request, existing);
         return PredictionMapper.toResponse(predictionRepository.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PredictionResponse get(Long id) {
-        return predictionRepository.findById(id).map(PredictionMapper::toResponse).orElseThrow();
+    public PredictionResponse get(UUID trackingId) {
+        return predictionRepository.findByTrackingId(trackingId).map(PredictionMapper::toResponse).orElseThrow();
     }
 
     @Override
@@ -83,42 +84,43 @@ public class PredictionServiceImpl implements PredictionService {
     }
 
     @Override
-    public void delete(Long id) {
-        predictionRepository.deleteById(id);
+    public void delete(UUID trackingId) {
+        Prediction existing = predictionRepository.findByTrackingId(trackingId).orElseThrow();
+        predictionRepository.delete(existing);
     }
 
     @Override
-    public List<PredictionResponse> findByArret(Long arretId) {
-        return predictionRepository.findByArretIdOrderByTempsRestantMinutesAsc(arretId)
+    public List<PredictionResponse> findByArret(UUID arretTrackingId) {
+        return predictionRepository.findByArret_TrackingIdOrderByTempsRestantMinutesAsc(arretTrackingId)
                 .stream().map(PredictionMapper::toResponse).toList();
     }
 
     @Override
-    public List<PredictionResponse> findByBus(Long busId) {
-        return predictionRepository.findByBusIdOrderByTempsRestantMinutesAsc(busId)
+    public List<PredictionResponse> findByBus(UUID busTrackingId) {
+        return predictionRepository.findByBus_TrackingIdOrderByTempsRestantMinutesAsc(busTrackingId)
                 .stream().map(PredictionMapper::toResponse).toList();
     }
 
     @Override
-    public void calculerPrediction(Long vehiculeId, Capteur capteurActuel) {
-        BusVehicule bv = busVehiculeRepository.findByVehiculeIdAndStatut(vehiculeId, "ACTIF").orElse(null);
+    public void calculerPrediction(UUID vehiculeTrackingId, Capteur capteurActuel) {
+        BusVehicule bv = busVehiculeRepository.findByVehicule_TrackingIdAndStatut(vehiculeTrackingId, "ACTIF").orElse(null);
         if (bv == null) {
             return;
         }
-        Mission mission = missionRepository.findByBusVehiculeIdAndStatut(bv.getId(), com.smart.sotral.transport.domain.enums.StatutMission.ACTIVE).orElse(null);
+        Mission mission = missionRepository.findByBusVehicule_TrackingIdAndStatut(bv.getTrackingId(), com.smart.sotral.transport.domain.enums.StatutMission.ACTIVE).orElse(null);
         if (mission == null) {
             return;
         }
 
-        Bus bus = busRepository.findById(bv.getBus().getId()).orElseThrow();
+        Bus bus = busRepository.findByTrackingId(bv.getBus().getTrackingId()).orElseThrow();
         Ligne ligne = bus.getLigne() != null ? bus.getLigne() : null;
         if (ligne == null) {
             return;
         }
 
-        List<LigneArret> arrets = ligneArretRepository.findByLigneIdOrderByOrdreAsc(ligne.getId());
-        int ordreActuel = determinerOrdreActuel(capteurActuel, ligne.getId());
-        double vitesse = calculerVitesseMoyenne(vehiculeId);
+        List<LigneArret> arrets = ligneArretRepository.findByLigne_TrackingIdOrderByOrdreAsc(ligne.getTrackingId());
+        int ordreActuel = determinerOrdreActuel(capteurActuel, ligne.getTrackingId());
+        double vitesse = calculerVitesseMoyenne(vehiculeTrackingId);
 
         for (LigneArret la : arrets) {
             if (la.getOrdre() <= ordreActuel) {
@@ -135,7 +137,7 @@ public class PredictionServiceImpl implements PredictionService {
             LocalDateTime heureEstimee = LocalDateTime.now().plusMinutes(tempsFinal);
 
             Prediction pred = predictionRepository
-                    .findByBusIdAndArretId(bus.getId(), arretCible.getId())
+                    .findByBus_TrackingIdAndArret_TrackingId(bus.getTrackingId(), arretCible.getTrackingId())
                     .orElse(new Prediction());
             pred.setBus(bus);
             pred.setLigne(ligne);
@@ -150,9 +152,9 @@ public class PredictionServiceImpl implements PredictionService {
     }
 
     private Prediction buildEntity(PredictionRequest request, Prediction entity) {
-        Bus bus = busRepository.findById(request.getBusId()).orElseThrow();
-        Ligne ligne = ligneRepository.findById(request.getLigneId()).orElseThrow();
-        Arret arret = arretRepository.findById(request.getArretId()).orElseThrow();
+        Bus bus = busRepository.findByTrackingId(request.getBusTrackingId()).orElseThrow();
+        Ligne ligne = ligneRepository.findByTrackingId(request.getLigneTrackingId()).orElseThrow();
+        Arret arret = arretRepository.findByTrackingId(request.getArretTrackingId()).orElseThrow();
         entity.setBus(bus);
         entity.setLigne(ligne);
         entity.setArret(arret);
@@ -163,8 +165,8 @@ public class PredictionServiceImpl implements PredictionService {
         return entity;
     }
 
-    private double calculerVitesseMoyenne(Long vehiculeId) {
-        List<Capteur> dernieres = capteurRepository.findTop5ByVehiculeIdOrderByHorodatageDesc(vehiculeId);
+    private double calculerVitesseMoyenne(UUID vehiculeTrackingId) {
+        List<Capteur> dernieres = capteurRepository.findTop5ByVehicule_TrackingIdOrderByHorodatageDesc(vehiculeTrackingId);
         if (dernieres.isEmpty()) {
             return 20.0;
         }
@@ -172,8 +174,8 @@ public class PredictionServiceImpl implements PredictionService {
         return Math.max(moyenne, 5.0);
     }
 
-    private int determinerOrdreActuel(Capteur capteur, Long ligneId) {
-        List<LigneArret> tous = ligneArretRepository.findByLigneIdOrderByOrdreAsc(ligneId);
+    private int determinerOrdreActuel(Capteur capteur, UUID ligneTrackingId) {
+        List<LigneArret> tous = ligneArretRepository.findByLigne_TrackingIdOrderByOrdreAsc(ligneTrackingId);
         int ordrePlusProche = 1;
         double distanceMin = Double.MAX_VALUE;
         for (LigneArret la : tous) {

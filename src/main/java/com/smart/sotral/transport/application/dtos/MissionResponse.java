@@ -1,6 +1,7 @@
 package com.smart.sotral.transport.application.dtos;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.smart.sotral.transport.domain.enums.StatutMission;
 
@@ -11,8 +12,9 @@ import lombok.Value;
 @Builder
 public class MissionResponse {
     Long id;
-    Long busVehiculeId;
-    Long conducteurId;
+    UUID trackingId;
+    UUID busVehiculeTrackingId;
+    UUID conducteurTrackingId;
     LocalDateTime dateDebut;
     LocalDateTime dateFin;
     StatutMission statut;

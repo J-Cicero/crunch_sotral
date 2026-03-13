@@ -48,6 +48,7 @@ public class SecurityConfig {
                         "/api/vehicules/**",
                         "/api/lignes/**",
                         "/api/ligne-arrets/**",
+                        "/api/capteurs/dernieres/**",
                         "/api/types-ligne/**",
                         "/api/predictions/**",
                         "/api/users/**"

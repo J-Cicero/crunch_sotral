@@ -7,8 +7,9 @@ public class MissionMapper {
     public static MissionResponse toResponse(Mission entity) {
         return MissionResponse.builder()
                 .id(entity.getId())
-                .busVehiculeId(entity.getBusVehicule().getId())
-                .conducteurId(entity.getConducteur().getId())
+                .trackingId(entity.getTrackingId())
+                .busVehiculeTrackingId(entity.getBusVehicule().getTrackingId())
+                .conducteurTrackingId(entity.getConducteur().getTrackingId())
                 .dateDebut(entity.getDateDebut())
                 .dateFin(entity.getDateFin())
                 .statut(entity.getStatut())

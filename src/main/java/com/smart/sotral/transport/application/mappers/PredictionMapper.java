@@ -7,9 +7,10 @@ public class PredictionMapper {
     public static PredictionResponse toResponse(Prediction entity) {
         return PredictionResponse.builder()
                 .id(entity.getId())
-                .busId(entity.getBus().getId())
-                .ligneId(entity.getLigne().getId())
-                .arretId(entity.getArret().getId())
+                .trackingId(entity.getTrackingId())
+                .busTrackingId(entity.getBus().getTrackingId())
+                .ligneTrackingId(entity.getLigne().getTrackingId())
+                .arretTrackingId(entity.getArret().getTrackingId())
                 .distanceRestanteKm(entity.getDistanceRestanteKm())
                 .tempsRestantMinutes(entity.getTempsRestantMinutes())
                 .heureEstimeeArrivee(entity.getHeureEstimeeArrivee())

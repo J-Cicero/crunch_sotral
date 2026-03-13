@@ -1,6 +1,7 @@
 package com.smart.sotral.transport.domain.services.servicesImpl;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,8 +33,8 @@ public class ArretServiceImpl implements ArretService {
     }
 
     @Override
-    public ArretResponse update(Long id, ArretRequest request) {
-        Arret existing = repository.findById(id).orElseThrow();
+    public ArretResponse update(UUID trackingId, ArretRequest request) {
+        Arret existing = repository.findByTrackingId(trackingId).orElseThrow();
         existing.setNom(request.getNom());
         existing.setLatitude(request.getLatitude());
         existing.setLongitude(request.getLongitude());
@@ -42,8 +43,8 @@ public class ArretServiceImpl implements ArretService {
 
     @Override
     @Transactional(readOnly = true)
-    public ArretResponse get(Long id) {
-        return repository.findById(id).map(ArretMapper::toResponse).orElseThrow();
+    public ArretResponse get(UUID trackingId) {
+        return repository.findByTrackingId(trackingId).map(ArretMapper::toResponse).orElseThrow();
     }
 
     @Override
@@ -53,7 +54,8 @@ public class ArretServiceImpl implements ArretService {
     }
 
     @Override
-    public void delete(Long id) {
-        repository.deleteById(id);
+    public void delete(UUID trackingId) {
+        Arret existing = repository.findByTrackingId(trackingId).orElseThrow();
+        repository.delete(existing);
     }
 }

@@ -50,6 +50,8 @@ public class UserMapper {
         user.setLastName(request.lastName());
         user.setEmail(request.email());
         user.setPassword(passwordEncoder.encode(request.password()));
+        user.setPhone(request.phone());
+        user.setCountry(request.country());
         user.setActive(true);
     }
 
@@ -62,10 +64,10 @@ public class UserMapper {
                 user.getTrackingId(),
                 user.getFirstName(),
                 user.getLastName(),
-                null, // phone removed
+                user.getPhone(),
                 user.getEmail(),
                 user.getRole().name(),
-                null, // country removed
+                user.getCountry(),
                 user.isActive()
         );
     }

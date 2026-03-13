@@ -1,6 +1,7 @@
 package com.smart.sotral.transport.domain.services.servicesImpl;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,16 +31,16 @@ public class TypeLigneServiceImpl implements TypeLigneService {
     }
 
     @Override
-    public TypeLigneResponse update(Long id, TypeLigneRequest request) {
-        TypeLigne existing = repository.findById(id).orElseThrow();
+    public TypeLigneResponse update(UUID trackingId, TypeLigneRequest request) {
+        TypeLigne existing = repository.findByTrackingId(trackingId).orElseThrow();
         existing.setNom(request.getNom());
         return TypeLigneMapper.toResponse(repository.save(existing));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public TypeLigneResponse get(Long id) {
-        return repository.findById(id).map(TypeLigneMapper::toResponse).orElseThrow();
+    public TypeLigneResponse get(UUID trackingId) {
+        return repository.findByTrackingId(trackingId).map(TypeLigneMapper::toResponse).orElseThrow();
     }
 
     @Override
@@ -49,7 +50,8 @@ public class TypeLigneServiceImpl implements TypeLigneService {
     }
 
     @Override
-    public void delete(Long id) {
-        repository.deleteById(id);
+    public void delete(UUID trackingId) {
+        TypeLigne existing = repository.findByTrackingId(trackingId).orElseThrow();
+        repository.delete(existing);
     }
 }

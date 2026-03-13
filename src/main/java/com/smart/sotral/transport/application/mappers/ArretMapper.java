@@ -7,6 +7,7 @@ public class ArretMapper {
     public static ArretResponse toResponse(Arret entity) {
         return ArretResponse.builder()
                 .id(entity.getId())
+                .trackingId(entity.getTrackingId())
                 .nom(entity.getNom())
                 .latitude(entity.getLatitude())
                 .longitude(entity.getLongitude())

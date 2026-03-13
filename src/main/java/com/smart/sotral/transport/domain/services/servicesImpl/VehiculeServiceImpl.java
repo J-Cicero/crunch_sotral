@@ -1,6 +1,7 @@
 package com.smart.sotral.transport.domain.services.servicesImpl;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +30,8 @@ public class VehiculeServiceImpl implements VehiculeService {
     }
 
     @Override
-    public VehiculeResponse update(Long id, VehiculeRequest request) {
-        Vehicule existing = repository.findById(id).orElseThrow();
+    public VehiculeResponse update(UUID trackingId, VehiculeRequest request) {
+        Vehicule existing = repository.findByTrackingId(trackingId).orElseThrow();
         existing.setMatricule(request.getMatricule());
         existing.setMarque(request.getMarque());
         existing.setModele(request.getModele());
@@ -40,8 +41,8 @@ public class VehiculeServiceImpl implements VehiculeService {
 
     @Override
     @Transactional(readOnly = true)
-    public VehiculeResponse get(Long id) {
-        return repository.findById(id).map(VehiculeMapper::toResponse).orElseThrow();
+    public VehiculeResponse get(UUID trackingId) {
+        return repository.findByTrackingId(trackingId).map(VehiculeMapper::toResponse).orElseThrow();
     }
 
     @Override
@@ -51,7 +52,8 @@ public class VehiculeServiceImpl implements VehiculeService {
     }
 
     @Override
-    public void delete(Long id) {
-        repository.deleteById(id);
+    public void delete(UUID trackingId) {
+        Vehicule existing = repository.findByTrackingId(trackingId).orElseThrow();
+        repository.delete(existing);
     }
 }

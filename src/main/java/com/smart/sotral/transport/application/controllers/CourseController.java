@@ -1,6 +1,7 @@
 package com.smart.sotral.transport.application.controllers;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +15,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import com.smart.sotral.transport.application.dtos.CourseRequest;
 import com.smart.sotral.transport.application.dtos.CourseResponse;
 import com.smart.sotral.transport.domain.services.CourseService;
 
 @RestController
 @RequestMapping("/api/courses")
+@Tag(name = "CourseController", description = "API de gestion des courses")
 public class CourseController {
 
     private final CourseService service;
@@ -29,13 +36,20 @@ public class CourseController {
     }
 
     @GetMapping
+    @Operation(summary = "Lister les courses", description = "Retourne la liste de toutes les courses")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Liste retournée")})
     public List<CourseResponse> findAll() {
         return service.list();
     }
 
-    @GetMapping("/{id}")
-    public CourseResponse findById(@PathVariable Long id) {
-        return service.get(id);
+    @GetMapping("/{trackingId}")
+    @Operation(summary = "Détail course", description = "Retourne une course par trackingId")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Course trouvée"),
+            @ApiResponse(responseCode = "404", description = "Course introuvable")
+    })
+    public CourseResponse findById(@PathVariable UUID trackingId) {
+        return service.get(trackingId);
     }
 
     @PostMapping
@@ -44,15 +58,15 @@ public class CourseController {
         return service.create(course);
     }
 
-    @PutMapping("/{id}")
-    public CourseResponse update(@PathVariable Long id, @RequestBody CourseRequest course) {
-        return service.update(id, course);
+    @PutMapping("/{trackingId}")
+    public CourseResponse update(@PathVariable UUID trackingId, @RequestBody CourseRequest course) {
+        return service.update(trackingId, course);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{trackingId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable UUID trackingId) {
+        service.delete(trackingId);
         return ResponseEntity.noContent().build();
     }
 }

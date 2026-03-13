@@ -4,11 +4,12 @@ import java.util.List;
 
 import com.smart.sotral.transport.application.dtos.LigneRequest;
 import com.smart.sotral.transport.application.dtos.LigneResponse;
+import java.util.UUID;
 
 public interface LigneService {
     LigneResponse create(LigneRequest request);
-    LigneResponse update(Long id, LigneRequest request);
-    LigneResponse get(Long id);
+    LigneResponse update(UUID trackingId, LigneRequest request);
+    LigneResponse get(UUID trackingId);
     List<LigneResponse> list();
-    void delete(Long id);
+    void delete(UUID trackingId);
 }

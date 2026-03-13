@@ -8,7 +8,6 @@ public class CapteurMapper {
         return CapteurResponse.builder()
                 .id(entity.getId())
                 .trackingId(entity.getTrackingId())
-                .vehiculeId(entity.getVehicule().getId())
                 .vehiculeTrackingId(entity.getVehicule().getTrackingId())
                 .latitude(entity.getLatitude())
                 .longitude(entity.getLongitude())

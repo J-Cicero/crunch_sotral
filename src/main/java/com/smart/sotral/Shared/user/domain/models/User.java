@@ -65,9 +65,15 @@ public class User extends BaseEntity implements UserDetails {
     @Column(length = 100, nullable = false)
     private String lastName;
 
+    @Column(length = 20)
+    private String phone;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private TypeRole role;
+
+    @Column(length = 100)
+    private String country;
 
     @Column(nullable = false)
     private boolean active = false;

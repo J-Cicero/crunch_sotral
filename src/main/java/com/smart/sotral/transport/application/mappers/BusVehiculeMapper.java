@@ -7,8 +7,9 @@ public class BusVehiculeMapper {
     public static BusVehiculeResponse toResponse(BusVehicule entity) {
         return BusVehiculeResponse.builder()
                 .id(entity.getId())
-                .busId(entity.getBus().getId())
-                .vehiculeId(entity.getVehicule().getId())
+                .trackingId(entity.getTrackingId())
+                .busTrackingId(entity.getBus().getTrackingId())
+                .vehiculeTrackingId(entity.getVehicule().getTrackingId())
                 .statut(entity.getStatut())
                 .build();
     }

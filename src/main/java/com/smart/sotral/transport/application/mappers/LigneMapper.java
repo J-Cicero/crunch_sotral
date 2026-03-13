@@ -7,10 +7,11 @@ public class LigneMapper {
     public static LigneResponse toResponse(Ligne entity) {
         return LigneResponse.builder()
                 .id(entity.getId())
+                .trackingId(entity.getTrackingId())
                 .numero(entity.getNumero())
                 .depart(entity.getDepart())
                 .arrive(entity.getArrive())
-                .typeLigneId(entity.getTypeLigne().getId())
+                .typeLigneTrackingId(entity.getTypeLigne().getTrackingId())
                 .build();
     }
 }

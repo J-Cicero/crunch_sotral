@@ -17,6 +17,8 @@ public class JavaConstant {
             API_BASE_URL + "/swagger-ui.html",
             API_BASE_URL + "/v3/api-docs/**",
             API_BASE_URL + "/api-docs/**",
+            "/swagger-resources/**",
+            "/webjars/**",
             "/actuator/health",  // Health check pour Render
             "/actuator/info"
     };

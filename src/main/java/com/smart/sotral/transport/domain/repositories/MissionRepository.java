@@ -12,4 +12,5 @@ public interface MissionRepository extends JpaRepository<Mission, Long> {
     Optional<Mission> findByTrackingId(java.util.UUID trackingId);
     List<Mission> findByBusVehicule_TrackingId(java.util.UUID busVehiculeTrackingId);
     List<Mission> findByConducteur_TrackingId(java.util.UUID conducteurTrackingId);
+    Optional<Mission> findByBusVehicule_TrackingIdAndStatut(java.util.UUID busVehiculeTrackingId, com.smart.sotral.transport.domain.enums.StatutMission statut);
 }

@@ -7,6 +7,7 @@ public class TypeLigneMapper {
     public static TypeLigneResponse toResponse(TypeLigne entity) {
         return TypeLigneResponse.builder()
                 .id(entity.getId())
+                .trackingId(entity.getTrackingId())
                 .nom(entity.getNom())
                 .build();
     }

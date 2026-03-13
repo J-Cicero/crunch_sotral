@@ -1,6 +1,7 @@
 package com.smart.sotral.transport.application.dtos;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -10,11 +11,11 @@ import lombok.Setter;
 @Setter
 public class PredictionRequest {
     @NotNull
-    private Long busId;
+    private UUID busTrackingId;
     @NotNull
-    private Long ligneId;
+    private UUID ligneTrackingId;
     @NotNull
-    private Long arretId;
+    private UUID arretTrackingId;
     private Double distanceRestanteKm;
     private Integer tempsRestantMinutes;
     private LocalDateTime heureEstimeeArrivee;

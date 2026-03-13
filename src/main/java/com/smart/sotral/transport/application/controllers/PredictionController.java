@@ -1,6 +1,7 @@
 package com.smart.sotral.transport.application.controllers;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.smart.sotral.transport.application.dtos.PredictionRequest;
 import com.smart.sotral.transport.application.dtos.PredictionResponse;
 import com.smart.sotral.transport.domain.services.PredictionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/predictions")
+@Tag(name = "PredictionController", description = "API des prédictions d'arrivée bus")
 public class PredictionController {
 
     private final PredictionService service;
@@ -33,9 +39,14 @@ public class PredictionController {
         return service.list();
     }
 
-    @GetMapping("/{id}")
-    public PredictionResponse findById(@PathVariable Long id) {
-        return service.get(id);
+    @GetMapping("/{trackingId}")
+    @Operation(summary = "Détail prédiction", description = "Retourne une prédiction par trackingId")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Prédiction trouvée"),
+            @ApiResponse(responseCode = "404", description = "Prédiction introuvable")
+    })
+    public PredictionResponse findById(@PathVariable UUID trackingId) {
+        return service.get(trackingId);
     }
 
     @PostMapping
@@ -44,25 +55,25 @@ public class PredictionController {
         return service.create(prediction);
     }
 
-    @PutMapping("/{id}")
-    public PredictionResponse update(@PathVariable Long id, @RequestBody PredictionRequest prediction) {
-        return service.update(id, prediction);
+    @PutMapping("/{trackingId}")
+    public PredictionResponse update(@PathVariable UUID trackingId, @RequestBody PredictionRequest prediction) {
+        return service.update(trackingId, prediction);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{trackingId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable UUID trackingId) {
+        service.delete(trackingId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/arret/{arretId}")
-    public List<PredictionResponse> findByArret(@PathVariable Long arretId) {
-        return service.findByArret(arretId);
+    @GetMapping("/arret/{arretTrackingId}")
+    public List<PredictionResponse> findByArret(@PathVariable UUID arretTrackingId) {
+        return service.findByArret(arretTrackingId);
     }
 
-    @GetMapping("/bus/{busId}")
-    public List<PredictionResponse> findByBus(@PathVariable Long busId) {
-        return service.findByBus(busId);
+    @GetMapping("/bus/{busTrackingId}")
+    public List<PredictionResponse> findByBus(@PathVariable UUID busTrackingId) {
+        return service.findByBus(busTrackingId);
     }
 }

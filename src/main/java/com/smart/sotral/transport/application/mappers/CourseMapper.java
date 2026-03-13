@@ -7,7 +7,8 @@ public class CourseMapper {
     public static CourseResponse toResponse(Course entity) {
         return CourseResponse.builder()
                 .id(entity.getId())
-                .missionId(entity.getMission().getId())
+                .trackingId(entity.getTrackingId())
+                .missionTrackingId(entity.getMission().getTrackingId())
                 .dateDebut(entity.getDateDebut())
                 .dateFin(entity.getDateFin())
                 .lieuDebut(entity.getLieuDebut())

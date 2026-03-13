@@ -16,8 +16,9 @@ public class BusMapper {
     public static BusResponse toResponse(Bus entity) {
         return BusResponse.builder()
                 .id(entity.getId())
+                .trackingId(entity.getTrackingId())
                 .code(entity.getCode())
-                .ligneId(entity.getLigne() != null ? entity.getLigne().getId() : null)
+                .ligneTrackingId(entity.getLigne() != null ? entity.getLigne().getTrackingId() : null)
                 .build();
     }
 }

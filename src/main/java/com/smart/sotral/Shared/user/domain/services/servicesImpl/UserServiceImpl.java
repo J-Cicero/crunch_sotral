@@ -81,11 +81,11 @@ public class UserServiceImpl implements UserService {
                     "Bearer",
                     userDetails.getFirstName(),
                     userDetails.getLastName(),
-                    null, // phone removed
+                    userDetails.getPhone(),
                     userDetails.getEmail(),
                     userDetails.getRole().name(),
                     rolesList,
-                    null, // country removed
+                    userDetails.getCountry(),
                     userDetails.isActive()
             );
 

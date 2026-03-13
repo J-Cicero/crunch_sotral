@@ -1,6 +1,7 @@
 package com.smart.sotral.transport.domain.services.servicesImpl;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,16 +38,16 @@ public class BusVehiculeServiceImpl implements BusVehiculeService {
     }
 
     @Override
-    public BusVehiculeResponse update(Long id, BusVehiculeRequest request) {
-        BusVehicule existing = repository.findById(id).orElseThrow();
+    public BusVehiculeResponse update(UUID trackingId, BusVehiculeRequest request) {
+        BusVehicule existing = repository.findByTrackingId(trackingId).orElseThrow();
         BusVehicule entity = buildEntity(request, existing);
         return BusVehiculeMapper.toResponse(repository.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public BusVehiculeResponse get(Long id) {
-        return repository.findById(id).map(BusVehiculeMapper::toResponse).orElseThrow();
+    public BusVehiculeResponse get(UUID trackingId) {
+        return repository.findByTrackingId(trackingId).map(BusVehiculeMapper::toResponse).orElseThrow();
     }
 
     @Override
@@ -56,13 +57,14 @@ public class BusVehiculeServiceImpl implements BusVehiculeService {
     }
 
     @Override
-    public void delete(Long id) {
-        repository.deleteById(id);
+    public void delete(UUID trackingId) {
+        BusVehicule existing = repository.findByTrackingId(trackingId).orElseThrow();
+        repository.delete(existing);
     }
 
     private BusVehicule buildEntity(BusVehiculeRequest request, BusVehicule entity) {
-        Bus bus = busRepository.findById(request.getBusId()).orElseThrow();
-        Vehicule vehicule = vehiculeRepository.findById(request.getVehiculeId()).orElseThrow();
+        Bus bus = busRepository.findByTrackingId(request.getBusTrackingId()).orElseThrow();
+        Vehicule vehicule = vehiculeRepository.findByTrackingId(request.getVehiculeTrackingId()).orElseThrow();
         entity.setBus(bus);
         entity.setVehicule(vehicule);
         entity.setStatut(request.getStatut());

@@ -4,11 +4,12 @@ import java.util.List;
 
 import com.smart.sotral.transport.application.dtos.ArretRequest;
 import com.smart.sotral.transport.application.dtos.ArretResponse;
+import java.util.UUID;
 
 public interface ArretService {
     ArretResponse create(ArretRequest request);
-    ArretResponse update(Long id, ArretRequest request);
-    ArretResponse get(Long id);
+    ArretResponse update(UUID trackingId, ArretRequest request);
+    ArretResponse get(UUID trackingId);
     List<ArretResponse> list();
-    void delete(Long id);
+    void delete(UUID trackingId);
 }

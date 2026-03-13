@@ -1,6 +1,7 @@
 package com.smart.sotral.transport.application.dtos;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.smart.sotral.transport.domain.enums.StatutCourse;
 
@@ -12,7 +13,7 @@ import lombok.Setter;
 @Setter
 public class CourseRequest {
     @NotNull
-    private Long missionId;
+    private UUID missionTrackingId;
     @NotNull
     private LocalDateTime dateDebut;
     private LocalDateTime dateFin;

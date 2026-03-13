@@ -1,6 +1,7 @@
 package com.smart.sotral.transport.domain.services.servicesImpl;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,17 +29,17 @@ public class BusServiceImpl implements BusService {
 
     @Override
     public BusResponse create(BusRequest request) {
-        Ligne ligne = request.getLigneId() != null ? ligneRepository.findById(request.getLigneId()).orElse(null) : null;
+        Ligne ligne = request.getLigneTrackingId() != null ? ligneRepository.findByTrackingId(request.getLigneTrackingId()).orElse(null) : null;
         Bus entity = BusMapper.toEntity(request, ligne);
         return BusMapper.toResponse(repository.save(entity));
     }
 
     @Override
-    public BusResponse update(Long id, BusRequest request) {
-        Bus existing = repository.findById(id).orElseThrow();
+    public BusResponse update(UUID trackingId, BusRequest request) {
+        Bus existing = repository.findByTrackingId(trackingId).orElseThrow();
         existing.setCode(request.getCode());
-        if (request.getLigneId() != null) {
-            Ligne ligne = ligneRepository.findById(request.getLigneId()).orElseThrow();
+        if (request.getLigneTrackingId() != null) {
+            Ligne ligne = ligneRepository.findByTrackingId(request.getLigneTrackingId()).orElseThrow();
             existing.setLigne(ligne);
         } else {
             existing.setLigne(null);
@@ -48,8 +49,8 @@ public class BusServiceImpl implements BusService {
 
     @Override
     @Transactional(readOnly = true)
-    public BusResponse get(Long id) {
-        return repository.findById(id).map(BusMapper::toResponse).orElseThrow();
+    public BusResponse get(UUID trackingId) {
+        return repository.findByTrackingId(trackingId).map(BusMapper::toResponse).orElseThrow();
     }
 
     @Override
@@ -59,7 +60,8 @@ public class BusServiceImpl implements BusService {
     }
 
     @Override
-    public void delete(Long id) {
-        repository.deleteById(id);
+    public void delete(UUID trackingId) {
+        Bus existing = repository.findByTrackingId(trackingId).orElseThrow();
+        repository.delete(existing);
     }
 }

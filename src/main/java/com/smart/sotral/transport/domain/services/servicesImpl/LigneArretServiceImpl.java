@@ -1,6 +1,7 @@
 package com.smart.sotral.transport.domain.services.servicesImpl;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,16 +38,16 @@ public class LigneArretServiceImpl implements LigneArretService {
     }
 
     @Override
-    public LigneArretResponse update(Long id, LigneArretRequest request) {
-        LigneArret existing = repository.findById(id).orElseThrow();
+    public LigneArretResponse update(UUID trackingId, LigneArretRequest request) {
+        LigneArret existing = repository.findByTrackingId(trackingId).orElseThrow();
         LigneArret entity = buildEntity(request, existing);
         return LigneArretMapper.toResponse(repository.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public LigneArretResponse get(Long id) {
-        return repository.findById(id).map(LigneArretMapper::toResponse).orElseThrow();
+    public LigneArretResponse get(UUID trackingId) {
+        return repository.findByTrackingId(trackingId).map(LigneArretMapper::toResponse).orElseThrow();
     }
 
     @Override
@@ -56,13 +57,14 @@ public class LigneArretServiceImpl implements LigneArretService {
     }
 
     @Override
-    public void delete(Long id) {
-        repository.deleteById(id);
+    public void delete(UUID trackingId) {
+        LigneArret existing = repository.findByTrackingId(trackingId).orElseThrow();
+        repository.delete(existing);
     }
 
     private LigneArret buildEntity(LigneArretRequest request, LigneArret entity) {
-        Ligne ligne = ligneRepository.findById(request.getLigneId()).orElseThrow();
-        Arret arret = arretRepository.findById(request.getArretId()).orElseThrow();
+        Ligne ligne = ligneRepository.findByTrackingId(request.getLigneTrackingId()).orElseThrow();
+        Arret arret = arretRepository.findByTrackingId(request.getArretTrackingId()).orElseThrow();
         entity.setLigne(ligne);
         entity.setArret(arret);
         entity.setOrdre(request.getOrdre());

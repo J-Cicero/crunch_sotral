@@ -1,22 +1,22 @@
 package com.smart.sotral.transport.application.dtos;
 
 import java.time.LocalDateTime;
-
-import com.smart.sotral.transport.domain.enums.SourceSignal;
+import java.util.UUID;
 
 import lombok.Builder;
 import lombok.Value;
 
 @Value
 @Builder
-public class CapteurResponse {
-    Long id;
-    java.util.UUID trackingId;
-    java.util.UUID vehiculeTrackingId;
+public class PositionBusDTO {
+    UUID vehiculeTrackingId;
+    UUID busTrackingId;
+    String busCode;
+    UUID ligneTrackingId;
+    String ligneNumero;
     Double latitude;
     Double longitude;
     Double vitesse;
-    Double cap;
     LocalDateTime horodatage;
-    SourceSignal sourceSignal;
+    Boolean missionActive;
 }
