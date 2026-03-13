@@ -14,7 +14,6 @@ public class ConducteurResponse {
     String firstName;
     String lastName;
     String email;
-    String numeroPermis;
     LocalDate dateEmbauche;
     boolean active;
 }

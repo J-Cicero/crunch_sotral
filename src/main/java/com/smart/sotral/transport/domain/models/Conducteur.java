@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import com.smart.sotral.Shared.user.domain.enums.TypeRole;
 import com.smart.sotral.Shared.user.domain.models.User;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrePersist;
@@ -17,9 +16,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Conducteur extends User {
-
-    @Column(nullable = false, length = 80)
-    private String numeroPermis;
 
     private LocalDate dateEmbauche;
 

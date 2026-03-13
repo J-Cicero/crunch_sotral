@@ -41,7 +41,6 @@ public class ConducteurServiceImpl implements ConducteurService {
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             existing.setPassword(mapper.encodePassword(request.getPassword()));
         }
-        existing.setNumeroPermis(request.getNumeroPermis());
         existing.setDateEmbauche(request.getDateEmbauche());
         return mapper.toResponse(repository.save(existing));
     }

@@ -25,7 +25,6 @@ public class ConducteurMapper {
         }
         c.setPassword(passwordEncoder.encode(request.getPassword()));
         c.setActive(true);
-        c.setNumeroPermis(request.getNumeroPermis());
         c.setDateEmbauche(request.getDateEmbauche());
         return c;
     }
@@ -41,7 +40,6 @@ public class ConducteurMapper {
                 .firstName(entity.getFirstName())
                 .lastName(entity.getLastName())
                 .email(entity.getEmail())
-                .numeroPermis(entity.getNumeroPermis())
                 .dateEmbauche(entity.getDateEmbauche())
                 .active(entity.isActive())
                 .build();
