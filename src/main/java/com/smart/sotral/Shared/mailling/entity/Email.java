@@ -8,13 +8,15 @@ import lombok.ToString;
 import java.io.Serializable;
 import java.util.UUID;
 
+import com.smart.sotral.Shared.utils.BaseEntity;
+
 
 @Entity
 @Table(name = "mailing_emails")
 @Builder
 @ToString
 @AllArgsConstructor
-public class Email implements Serializable {
+public class Email extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

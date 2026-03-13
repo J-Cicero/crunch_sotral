@@ -37,9 +37,21 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;
 
     public UserResponse createUser(UserRequest request){
-        User user = this.userMapper.toEntity(request);
-        User savedUser = this.userRepository.save(user);
-       return this.userMapper.toResponse(user);
+        return createUsager(request);
+    }
+
+    @Override
+    public UserResponse createAdmin(UserRequest request) {
+        User admin = this.userMapper.toAdmin(request);
+        User savedAdmin = this.userRepository.save(admin);
+        return this.userMapper.toResponse(savedAdmin);
+    }
+
+    @Override
+    public UserResponse createUsager(UserRequest request) {
+        User usager = this.userMapper.toUsager(request);
+        User savedUsager = this.userRepository.save(usager);
+        return this.userMapper.toResponse(savedUsager);
 
     }
 

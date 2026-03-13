@@ -7,21 +7,29 @@ public class JavaConstant {
     public static final String OPTIONS_HTTP_METHOD = "OPTIONS";
 
     public final static String[] PUBLIC_URLS = {
-            "/users/**",
+            "/api/users/**",
             API_BASE_URL + "/public/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/v3/api-docs/**",
             "/api-docs/**",
+            API_BASE_URL + "/swagger-ui/**",
+            API_BASE_URL + "/swagger-ui.html",
+            API_BASE_URL + "/v3/api-docs/**",
+            API_BASE_URL + "/api-docs/**",
             "/actuator/health",  // Health check pour Render
             "/actuator/info"
     };
 
-    // URLs pour ADMINISTRATEUR (accès complet)
-    public final static String[] ADMINISTRATEUR_URLS = {
+    // URLs pour ADMIN
+    public final static String[] ADMIN_URLS = {
             "/admin/**",
             "/users/all/**",
             "/config/**"
+    };
+
+    public final static String[] ADMIN_ONLY_URLS = {
+            "/api/users/register/admin"
     };
     
     // URLs pour GESTIONNAIRE
@@ -30,8 +38,8 @@ public class JavaConstant {
             "/reports/**"
     };
 
-    // URLs pour UTILISATEUR authentifié
-    public final static String[] UTILISATEUR_URLS = {
+    // URLs pour USAGER authentifié
+    public final static String[] USAGER_URLS = {
             "/profile/**",
             "/dashboard/**"
     };

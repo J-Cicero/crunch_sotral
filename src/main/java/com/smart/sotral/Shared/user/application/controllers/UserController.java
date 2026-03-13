@@ -27,7 +27,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @AllArgsConstructor
 @Tag(name = "UserController", description = "api permettant a un utilisateur de s'enregistrer et de se connecter ")
 public class UserController {
@@ -45,9 +45,20 @@ public class UserController {
             })
     @PostMapping("/register")
     public ResponseEntity<UserResponse> createUser(@RequestBody @Valid UserRequest request){
-        return ResponseEntity.ok(userService.createUser(request));
+        return ResponseEntity.ok(userService.createUsager(request));
     }
 
+    @PostMapping("/register/admin")
+    @Operation(summary = "Register a new admin")
+    public ResponseEntity<UserResponse> createAdmin(@RequestBody @Valid UserRequest request){
+        return ResponseEntity.ok(userService.createAdmin(request));
+    }
+
+    @PostMapping("/register/usager")
+    @Operation(summary = "Register a new usager")
+    public ResponseEntity<UserResponse> createUsager(@RequestBody @Valid UserRequest request){
+        return ResponseEntity.ok(userService.createUsager(request));
+    }
 
 
     @PostMapping("/login")

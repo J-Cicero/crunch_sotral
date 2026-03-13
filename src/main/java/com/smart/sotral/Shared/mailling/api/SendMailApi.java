@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/mailing/")
+@RequestMapping("/api/mailing")
 public class SendMailApi {
 
     private final EmailService emailService;
@@ -41,4 +41,3 @@ public class SendMailApi {
         }
     }
 }
-

@@ -6,6 +6,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
+
+import com.smart.sotral.Shared.constants.JavaConstant;
+import com.smart.sotral.Shared.jwt.filters.JwtAuthorizationToken;
 
 @Configuration
 public class SecurityConfig {
@@ -20,5 +28,35 @@ public class SecurityConfig {
             AuthenticationConfiguration authenticationConfiguration
     ) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            JwtAuthorizationToken jwtAuthorizationToken
+    ) throws Exception {
+        http.csrf(csrf -> csrf.disable());
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(JavaConstant.ADMIN_ONLY_URLS).hasRole("ADMIN")
+                .requestMatchers(JavaConstant.PUBLIC_URLS).permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/capteurs/position").permitAll()
+                .requestMatchers(HttpMethod.GET,
+                        "/api/arrets/**",
+                        "/api/bus/**",
+                        "/api/vehicules/**",
+                        "/api/lignes/**",
+                        "/api/ligne-arrets/**",
+                        "/api/types-ligne/**",
+                        "/api/predictions/**",
+                        "/api/users/**"
+                ).permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/**").hasAnyRole("ADMIN", "USAGER", "CONDUCTEUR")
+                .requestMatchers("/api/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+        );
+        http.addFilterBefore(jwtAuthorizationToken, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
     }
 }

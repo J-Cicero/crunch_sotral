@@ -11,6 +11,8 @@ import com.smart.sotral.Shared.user.application.dtos.responses.UserResponse;
 public interface UserService {
 
     UserResponse createUser(UserRequest request);
+    UserResponse createAdmin(UserRequest request);
+    UserResponse createUsager(UserRequest request);
     LoginResponse authenticate(LoginRequest request);
     UserResponse getUserByTrackingId(UUID trackingId);
     public UserResponse updateUserEtat(UUID trackingId, boolean etat);

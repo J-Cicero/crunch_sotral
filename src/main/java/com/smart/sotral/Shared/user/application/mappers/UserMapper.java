@@ -9,6 +9,8 @@ import com.smart.sotral.Shared.user.application.dtos.requests.UserRequest;
 import com.smart.sotral.Shared.user.application.dtos.responses.UserResponse;
 import com.smart.sotral.Shared.user.domain.enums.TypeRole;
 import com.smart.sotral.Shared.user.domain.models.User;
+import com.smart.sotral.Shared.user.domain.models.Admin;
+import com.smart.sotral.Shared.user.domain.models.Usager;
 
 
 @Component
@@ -20,20 +22,35 @@ public class UserMapper {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User toEntity(UserRequest request){
+    public Admin toAdmin(UserRequest request){
         if (request == null) {
             throw new IllegalArgumentException("UserRequest ne peut pas être null");
         }
-        User user = new User();
-        user.setTrackingId(UUID.randomUUID());
+        Admin admin = new Admin();
+        applyCommonFields(admin, request);
+        admin.setRole(TypeRole.ADMIN);
+        return admin;
+    }
+
+    public Usager toUsager(UserRequest request){
+        if (request == null) {
+            throw new IllegalArgumentException("UserRequest ne peut pas être null");
+        }
+        Usager usager = new Usager();
+        applyCommonFields(usager, request);
+        usager.setRole(TypeRole.USAGER);
+        return usager;
+    }
+
+    private void applyCommonFields(User user, UserRequest request) {
+        if (user.getTrackingId() == null) {
+            user.setTrackingId(UUID.randomUUID());
+        }
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
         user.setEmail(request.email());
         user.setPassword(passwordEncoder.encode(request.password()));
-        
-        user.setRole(TypeRole.ADMINISTRATEUR);
         user.setActive(true);
-        return user;
     }
 
     public UserResponse toResponse(User user){
