@@ -21,11 +21,14 @@ public class OpenApiConfig {
     @Value("${server.servlet.context-path:/api}")
     private String contextPath;
 
+    @Value("${springdoc.swagger-ui.server-url:}")
+    private String swaggerUiServerUrl;
+
     @Bean
     public OpenAPI customOpenAPI() {
         final String securitySchemeName = "bearerAuth";
 
-        return new OpenAPI()
+        var api = new OpenAPI()
                 .info(
                         new Info()
                                 .title("Sotral Backend API")
@@ -38,12 +41,7 @@ public class OpenApiConfig {
                                                 .email("nitchcorp@gmail.com")
                                                 .url("https://sotral.tech"))
                                 .license(new License().name("Proprietary").url("https://sotral.tech/license")))
-                .servers(
-                        List.of(
-                                new Server().url(contextPath).description("Serveur de développement"),
-                                new Server()
-                                        .url("https://sotral-backend.onrender.com/api")
-                                        .description("Serveur de production")))
+                .servers(List.of(new Server().url("http://localhost:8080").description("Localhost")))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(
                         new Components()
@@ -63,5 +61,7 @@ public class OpenApiConfig {
                                                                 + "4. Collez le token dans le champ 'Value'\n"
                                                                 + "5. Cliquez sur 'Authorize' puis 'Close'\n\n"
                                                                 + "Le token sera automatiquement ajouté à toutes les requêtes.")));
+        // Ignore external overrides: force localhost only
+        return api;
     }
 }

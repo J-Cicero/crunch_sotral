@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.http.HttpMethod;
 
@@ -36,6 +37,7 @@ public class SecurityConfig {
             JwtAuthorizationToken jwtAuthorizationToken
     ) throws Exception {
         http.csrf(csrf -> csrf.disable());
+        http.cors(Customizer.withDefaults());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -45,11 +47,19 @@ public class SecurityConfig {
                         "/v3/api-docs",
                         "/v3/api-docs/**",
                         "/api/auth/**",
-                        "/api/capteurs/position"
+                        "/api/capteurs/position",
+                        "/api/users/login",
+                        "/api/users/register",
+                        "/api/users/register/usager"
                 ).permitAll()
-                .requestMatchers(JavaConstant.ADMIN_ONLY_URLS).hasRole("ADMIN")
+                // Création d'admin rendue publique
+                .requestMatchers(JavaConstant.ADMIN_ONLY_URLS).permitAll()
                 .requestMatchers(JavaConstant.PUBLIC_URLS).permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/capteurs/position").permitAll()
+                // Conducteur ou Admin peuvent mettre à jour l'état des bus (retard, panne, etc.)
+                .requestMatchers(HttpMethod.PUT, "/api/bus/**").hasAnyRole("ADMIN", "CONDUCTEUR", "USAGER")
+                .requestMatchers(HttpMethod.PATCH, "/api/bus/**").hasAnyRole("ADMIN", "CONDUCTEUR", "USAGER")
+                .requestMatchers(HttpMethod.POST, "/api/bus/**").hasAnyRole("ADMIN", "CONDUCTEUR", "USAGER")
                 .requestMatchers(HttpMethod.GET,
                         "/api/arrets/**",
                         "/api/bus/**",

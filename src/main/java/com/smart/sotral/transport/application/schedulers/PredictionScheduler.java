@@ -15,7 +15,7 @@ import com.smart.sotral.transport.domain.services.PredictionService;
 import com.smart.sotral.transport.domain.enums.StatutMission;
 import java.util.UUID;
 
-@Component
+//@Component
 public class PredictionScheduler {
 
     private final CapteurRepository capteurRepository;
@@ -33,7 +33,7 @@ public class PredictionScheduler {
         this.predictionService = predictionService;
     }
 
-    @Scheduled(fixedDelay = 30000)
+    @Scheduled(initialDelay = 60000, fixedDelay = 30000)
     public void recalculerToutesPredictions() {
         List<BusVehicule> actifs = busVehiculeRepository.findByStatut("ACTIF");
         for (BusVehicule bv : actifs) {
@@ -49,7 +49,7 @@ public class PredictionScheduler {
         }
     }
 
-    @Scheduled(fixedDelay = 600000)
+    @Scheduled(initialDelay = 120000, fixedDelay = 600000)
     public void nettoyerPredictionsObsoletes() {
         // simple: delete predictions if no active mission found
         var actifs = missionRepository.findByStatut(StatutMission.ACTIVE);

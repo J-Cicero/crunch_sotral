@@ -36,10 +36,6 @@ public class Prediction extends BaseEntity {
     private Bus bus;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ligne_id", nullable = false)
-    private Ligne ligne;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "arret_id", nullable = false)
     private Arret arret;
 

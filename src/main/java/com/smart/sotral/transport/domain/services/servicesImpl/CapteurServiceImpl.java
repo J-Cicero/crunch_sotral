@@ -17,7 +17,6 @@ import com.smart.sotral.transport.domain.enums.StatutMission;
 import com.smart.sotral.transport.domain.models.Bus;
 import com.smart.sotral.transport.domain.models.BusVehicule;
 import com.smart.sotral.transport.domain.models.Capteur;
-import com.smart.sotral.transport.domain.models.Ligne;
 import com.smart.sotral.transport.domain.models.Vehicule;
 import com.smart.sotral.transport.domain.repositories.BusRepository;
 import com.smart.sotral.transport.domain.repositories.BusVehiculeRepository;
@@ -82,20 +81,16 @@ public class CapteurServiceImpl implements CapteurService {
     @Override
     @Transactional(readOnly = true)
     public List<PositionBusDTO> getDernieresPositionsActives() {
-        return buildPositions(busVehiculeRepository.findByStatut("ACTIF"));
+        // Pas de requête globale en arrière-plan : retour vide par défaut
+        return List.of();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<PositionBusDTO> getDernieresPositionsParLigne(UUID ligneTrackingId) {
-        List<Bus> buses = busRepository.findByLigne_TrackingId(ligneTrackingId);
-        if (buses.isEmpty()) {
-            return List.of();
-        }
-        List<Long> busIds = buses.stream().map(Bus::getId).toList();
-        List<BusVehicule> vehicules = busVehiculeRepository.findByBus_TrackingIdInAndStatut(
-                buses.stream().map(Bus::getTrackingId).toList(), "ACTIF");
-        return buildPositions(vehicules);
+        // Ligne information is no longer stored on Bus; without a replacement mapping
+        // this endpoint cannot resolve buses for a ligne, so return empty for now.
+        return List.of();
     }
 
     @Override
@@ -168,13 +163,10 @@ public class CapteurServiceImpl implements CapteurService {
         }
         Capteur capteur = latest.get();
         Bus bus = busVehicule.getBus();
-        Ligne ligne = bus.getLigne();
         return Optional.of(PositionBusDTO.builder()
                 .vehiculeTrackingId(busVehicule.getVehicule().getTrackingId())
                 .busTrackingId(bus.getTrackingId())
                 .busCode(bus.getCode())
-                .ligneTrackingId(ligne != null ? ligne.getTrackingId() : null)
-                .ligneNumero(ligne != null ? ligne.getNumero() : null)
                 .latitude(capteur.getLatitude())
                 .longitude(capteur.getLongitude())
                 .vitesse(capteur.getVitesse())

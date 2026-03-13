@@ -1,9 +1,11 @@
 package com.smart.sotral.transport.application.mappers;
 
+import org.springframework.stereotype.Component;
 import com.smart.sotral.transport.application.dtos.VehiculeRequest;
 import com.smart.sotral.transport.application.dtos.VehiculeResponse;
 import com.smart.sotral.transport.domain.models.Vehicule;
 
+@Component
 public class VehiculeMapper {
     public static Vehicule toEntity(VehiculeRequest request) {
         Vehicule v = new Vehicule();

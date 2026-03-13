@@ -1,17 +1,18 @@
 package com.smart.sotral.transport.domain.models;
 
 import com.smart.sotral.Shared.utils.BaseEntity;
+import com.smart.sotral.transport.domain.models.BusVehicule;
 import java.util.UUID;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-
+import java.util.ArrayList;
+import java.util.List;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,9 +33,8 @@ public class Bus extends BaseEntity {
     @Column(nullable = false, unique = true, length = 40)
     private String code;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ligne_id")
-    private Ligne ligne;
+    @OneToMany(mappedBy = "bus", fetch = FetchType.LAZY)
+    private List<BusVehicule> busVehicules = new ArrayList<>();
 
     @PrePersist
     public void ensureTracking() {

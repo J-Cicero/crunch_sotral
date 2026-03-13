@@ -13,8 +13,6 @@ public class PredictionRequest {
     @NotNull
     private UUID busTrackingId;
     @NotNull
-    private UUID ligneTrackingId;
-    @NotNull
     private UUID arretTrackingId;
     private Double distanceRestanteKm;
     private Integer tempsRestantMinutes;

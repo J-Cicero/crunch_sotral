@@ -32,7 +32,6 @@ public record UserRequest(
         @NotNull(message = "Le mot de passe est obligatoire")
         String password,
 
-        @NotNull(message = "Le pays est obligatoire")
         String country
 
 ) {

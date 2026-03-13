@@ -34,7 +34,7 @@ public class Capteur extends BaseEntity {
     @Column(nullable = false, unique = true, updatable = false)
     private UUID trackingId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "vehicule_id", nullable = false)
     private Vehicule vehicule;
 

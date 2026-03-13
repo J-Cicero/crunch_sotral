@@ -40,6 +40,7 @@ public class MailConfigInitializer {
     }
 
     @Bean
+    @org.springframework.context.annotation.Profile("mail-init")
     public CommandLineRunner initEmailConfig() {
         return args -> {
             try {

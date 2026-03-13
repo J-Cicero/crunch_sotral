@@ -10,5 +10,4 @@ public class BusResponse {
     Long id;
     UUID trackingId;
     String code;
-    UUID ligneTrackingId;
 }

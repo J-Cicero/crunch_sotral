@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
 @OpenAPIDefinition(
     info = @Info(title = "SOTRAL API", version = "1.0",
                  description = "Système d'Information Voyageurs — Lomé, Togo"),
-    servers = @Server(url = "http://192.168.210.216:8080")
+    servers = @Server(url = "http://localhost:8080")
 )
 public class SotralApplication {
 

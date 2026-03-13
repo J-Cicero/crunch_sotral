@@ -12,8 +12,6 @@ public class PositionBusDTO {
     UUID vehiculeTrackingId;
     UUID busTrackingId;
     String busCode;
-    UUID ligneTrackingId;
-    String ligneNumero;
     Double latitude;
     Double longitude;
     Double vitesse;

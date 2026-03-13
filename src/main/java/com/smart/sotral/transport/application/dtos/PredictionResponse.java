@@ -12,7 +12,6 @@ public class PredictionResponse {
     Long id;
     UUID trackingId;
     UUID busTrackingId;
-    UUID ligneTrackingId;
     UUID arretTrackingId;
     Double distanceRestanteKm;
     Integer tempsRestantMinutes;

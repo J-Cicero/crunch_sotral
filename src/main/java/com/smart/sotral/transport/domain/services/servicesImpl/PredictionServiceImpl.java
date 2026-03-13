@@ -14,7 +14,6 @@ import com.smart.sotral.transport.domain.models.Arret;
 import com.smart.sotral.transport.domain.models.Bus;
 import com.smart.sotral.transport.domain.models.BusVehicule;
 import com.smart.sotral.transport.domain.models.Capteur;
-import com.smart.sotral.transport.domain.models.Ligne;
 import com.smart.sotral.transport.domain.models.LigneArret;
 import com.smart.sotral.transport.domain.models.Mission;
 import com.smart.sotral.transport.domain.models.Prediction;
@@ -35,7 +34,6 @@ public class PredictionServiceImpl implements PredictionService {
     private final BusVehiculeRepository busVehiculeRepository;
     private final MissionRepository missionRepository;
     private final BusRepository busRepository;
-    private final LigneRepository ligneRepository;
     private final LigneArretRepository ligneArretRepository;
     private final ArretRepository arretRepository;
     private final com.smart.sotral.transport.domain.repositories.CapteurRepository capteurRepository;
@@ -44,7 +42,6 @@ public class PredictionServiceImpl implements PredictionService {
                                  BusVehiculeRepository busVehiculeRepository,
                                  MissionRepository missionRepository,
                                  BusRepository busRepository,
-                                 LigneRepository ligneRepository,
                                  LigneArretRepository ligneArretRepository,
                                  ArretRepository arretRepository,
                                  com.smart.sotral.transport.domain.repositories.CapteurRepository capteurRepository) {
@@ -52,7 +49,6 @@ public class PredictionServiceImpl implements PredictionService {
         this.busVehiculeRepository = busVehiculeRepository;
         this.missionRepository = missionRepository;
         this.busRepository = busRepository;
-        this.ligneRepository = ligneRepository;
         this.ligneArretRepository = ligneArretRepository;
         this.arretRepository = arretRepository;
         this.capteurRepository = capteurRepository;
@@ -113,50 +109,15 @@ public class PredictionServiceImpl implements PredictionService {
         }
 
         Bus bus = busRepository.findByTrackingId(bv.getBus().getTrackingId()).orElseThrow();
-        Ligne ligne = bus.getLigne() != null ? bus.getLigne() : null;
-        if (ligne == null) {
-            return;
-        }
-
-        List<LigneArret> arrets = ligneArretRepository.findByLigne_TrackingIdOrderByOrdreAsc(ligne.getTrackingId());
-        int ordreActuel = determinerOrdreActuel(capteurActuel, ligne.getTrackingId());
-        double vitesse = calculerVitesseMoyenne(vehiculeTrackingId);
-
-        for (LigneArret la : arrets) {
-            if (la.getOrdre() <= ordreActuel) {
-                continue;
-            }
-            Arret arretCible = la.getArret();
-            double distanceKm = haversine(capteurActuel.getLatitude(), capteurActuel.getLongitude(),
-                    arretCible.getLatitude(), arretCible.getLongitude());
-            int nbIntermediaires = la.getOrdre() - ordreActuel - 1;
-            double tempsBase = (distanceKm / vitesse) * 60;
-            double tempsArrets = nbIntermediaires * 2.0;
-            double tampon = vitesse < 15.0 ? tempsBase * 0.20 : 0.0;
-            int tempsFinal = (int) Math.round(tempsBase + tempsArrets + tampon);
-            LocalDateTime heureEstimee = LocalDateTime.now().plusMinutes(tempsFinal);
-
-            Prediction pred = predictionRepository
-                    .findByBus_TrackingIdAndArret_TrackingId(bus.getTrackingId(), arretCible.getTrackingId())
-                    .orElse(new Prediction());
-            pred.setBus(bus);
-            pred.setLigne(ligne);
-            pred.setArret(arretCible);
-            pred.setDistanceRestanteKm(distanceKm);
-            pred.setTempsRestantMinutes(tempsFinal);
-            pred.setHeureEstimeeArrivee(heureEstimee);
-            pred.setHorodatage(LocalDateTime.now());
-
-            predictionRepository.save(pred);
-        }
+        // Bus is no longer linked to a ligne; until a new route source is provided,
+        // we skip prediction calculations to avoid inconsistent data.
+        return;
     }
 
     private Prediction buildEntity(PredictionRequest request, Prediction entity) {
         Bus bus = busRepository.findByTrackingId(request.getBusTrackingId()).orElseThrow();
-        Ligne ligne = ligneRepository.findByTrackingId(request.getLigneTrackingId()).orElseThrow();
         Arret arret = arretRepository.findByTrackingId(request.getArretTrackingId()).orElseThrow();
         entity.setBus(bus);
-        entity.setLigne(ligne);
         entity.setArret(arret);
         entity.setDistanceRestanteKm(request.getDistanceRestanteKm());
         entity.setTempsRestantMinutes(request.getTempsRestantMinutes());
